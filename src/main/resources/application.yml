@@ -1,0 +1,42 @@
+# ============================================================
+# Before You Go — Application Configuration
+# ============================================================
+
+spring:
+  application:
+    name: before-you-go
+
+  # --- Database ---
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:beforeyougo}
+    username: ${POSTGRES_USER:byg_user}
+    password: ${POSTGRES_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # --- Flyway ---
+  flyway:
+    enabled: true
+    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:false}
+    locations: classpath:db/migration
+
+# --- Server ---
+server:
+  port: ${SERVER_PORT:8080}
+
+# --- Actuator ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never

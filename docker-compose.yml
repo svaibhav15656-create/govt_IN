@@ -1,0 +1,42 @@
+# ============================================================
+# Docker Compose — Before You Go (local development)
+# ============================================================
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: byg-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-beforeyougo}
+      POSTGRES_USER: ${POSTGRES_USER:-byg_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-localdev}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - byg-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-byg_user} -d ${POSTGRES_DB:-beforeyougo}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: byg-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-beforeyougo}
+      POSTGRES_USER: ${POSTGRES_USER:-byg_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-localdev}
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+      FLYWAY_BASELINE_ON_MIGRATE: "true"
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+
+volumes:
+  byg-pgdata:
