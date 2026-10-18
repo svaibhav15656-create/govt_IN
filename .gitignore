@@ -30,6 +30,9 @@ docker-data/
 *.log
 logs/
 
+# === LGD data files (downloaded, not committed) ===
+data/lgd/*.csv
+
 # === Node (front-end, future) ===
 node_modules/
 dist/
